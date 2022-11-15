@@ -8,7 +8,7 @@ namespace CustomerOrderProduct.Interfaces
 		Task<Customer> GetCustomerById(Guid id);
 		Task<ICollection<Customer>> GetCustomers();
 		Task<CustomerDto> CreateCustomer(CustomerDto customerDto);
-		Task<Customer> UpdateCustomer(CustomerDto customerDto);
-		Task DeleteCustomer(Guid id);
+		Task<CustomerDto> UpdateCustomer(CustomerDto customerDto);
+		Task<CustomerDto> DeleteCustomer(Guid id);
 	}
 }

@@ -10,6 +10,7 @@
 		public string? Address { get; set; }
 		public DateTime? BirthDate { get; set; }
 		public DateTime? CreatedDate { get; set; }
+		public DateTime? UpdatedDate { get; set; }
 
 		public virtual ICollection<Order>? Orders { get; set; }
 	}

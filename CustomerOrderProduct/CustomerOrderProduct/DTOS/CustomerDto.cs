@@ -12,6 +12,7 @@ namespace CustomerOrderProduct.DTOS
 		public string? Address { get; set; }
 		public DateTime? BirthDate { get; set; }
 		public DateTime? CreatedDate { get; set; }
+		public DateTime? UpdatedDate { get; set; }
 
 		public ICollection<Order>? Orders { get; set; }
 	}

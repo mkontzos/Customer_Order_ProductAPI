@@ -21,12 +21,12 @@ namespace CustomerOrderProduct.Services
 			throw new NotImplementedException();
 		}
 
-		public Task<Product> UpdateProduct(ProductDto productDto)
+		public Task<ProductDto> UpdateProduct(ProductDto productDto)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task DeleteProduct(Guid id)
+		public Task<ProductDto> DeleteProduct(Guid id)
 		{
 			throw new NotImplementedException();
 		}

@@ -1,4 +1,6 @@
-﻿using CustomerOrderProduct.Interfaces;
+﻿using CustomerOrderProduct.DTOS;
+using CustomerOrderProduct.Interfaces;
+using CustomerOrderProduct.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerOrderProduct.Controllers
@@ -20,44 +22,118 @@ namespace CustomerOrderProduct.Controllers
 		{
 			try
 			{
-				var customers = await _customerService.GetCustomers();
+				var result = await _customerService.GetCustomers();
 
+				if (result.Count > 0)
+				{
+					return Ok(result);
+				}
 
+				return NotFound();
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-
-				throw;
+				return BadRequest(e);
 			}
-			return null;
 		}
 
 		[HttpGet]
 		[Route("get/{id}")]
 		public async Task<ActionResult> GetById(Guid id)
 		{
-			return null;
+			try
+			{
+				var result = await _customerService.GetCustomerById(id);
+
+				if (result != null)
+				{
+					return Ok(result);
+				}
+
+				return NotFound();
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e);
+			}
 		}
 
 		[HttpPost]
 		[Route("add")]
-		public async Task<ActionResult> Create()
+		public async Task<ActionResult> Create([FromBody] CustomerDto customerDto)
 		{
-			return null;
+			if (customerDto != null)
+			{
+				try
+				{
+					var result = await _customerService.CreateCustomer(customerDto);
+
+					if (result != null)
+					{
+						return Ok(result);
+					}
+
+					return BadRequest();
+				}
+				catch (Exception e)
+				{
+					return BadRequest(e);
+				}
+			}
+
+			return BadRequest();
 		}
 
 		[HttpPost]
 		[Route("update")]
-		public async Task<ActionResult> Update()
+		public async Task<ActionResult> Update([FromBody] CustomerDto customerDto)
 		{
-			return null;
+			if (customerDto != null)
+			{
+				try
+				{
+					var result = await _customerService.UpdateCustomer(customerDto);
+
+					if (result != null)
+					{
+						return Ok(result);
+					}
+
+					return NotFound();
+				}
+				catch (Exception e)
+				{
+					return BadRequest(e);
+				}
+			}
+
+			return BadRequest();
 		}
 
 		[HttpDelete]
 		[Route("delete/{id}")]
 		public async Task<ActionResult> Delete(Guid id)
 		{
-			return null;
+			if (id != Guid.Empty)
+			{
+				try
+				{
+					var result = await _customerService.DeleteCustomer(id);
+
+					if (result != null)
+					{
+						return Ok(result);
+					}
+
+					return NotFound();
+				}
+				catch (Exception e)
+				{
+					return BadRequest(e);
+				}
+			}
+
+			return BadRequest();
 		}
 	}
 }

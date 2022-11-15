@@ -8,7 +8,7 @@ namespace CustomerOrderProduct.Interfaces
 		Task<Product> GetProductById(Guid id);
 		Task<ICollection<Product>> GetProducts();
 		Task<ProductDto> CreateProduct(ProductDto productDto);
-		Task<Product> UpdateProduct(ProductDto productDto);
-		Task DeleteProduct(Guid id);
+		Task<ProductDto> UpdateProduct(ProductDto productDto);
+		Task<ProductDto> DeleteProduct(Guid id);
 	}
 }
