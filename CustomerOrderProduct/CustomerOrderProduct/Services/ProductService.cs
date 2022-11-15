@@ -4,29 +4,29 @@ using CustomerOrderProduct.Models;
 
 namespace CustomerOrderProduct.Services
 {
-	public class CustomerService : ICustomerService
+	public class ProductService : IProductService
 	{
-		public Task<CustomerDto> CreateCustomer(CustomerDto customerDto)
+		public Task<ProductDto> CreateProduct(ProductDto productDto)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<Customer> GetCustomerById(Guid id)
+		public Task<Product> GetProductById(Guid id)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<ICollection<Customer>> GetCustomers()
+		public Task<ICollection<Product>> GetProducts()
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<Customer> UpdateCustomer(CustomerDto customerDto)
+		public Task<Product> UpdateProduct(ProductDto productDto)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task DeleteCustomer(Guid id)
+		public Task DeleteProduct(Guid id)
 		{
 			throw new NotImplementedException();
 		}
