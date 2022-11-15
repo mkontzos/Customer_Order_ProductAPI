@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CustomerOrderProduct.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerOrderProduct.Controllers
 {
@@ -6,37 +7,55 @@ namespace CustomerOrderProduct.Controllers
 	[Route("[controller]")]
 	public class CustomerController : ControllerBase
 	{
+		private readonly ICustomerService _customerService;
+
+		public CustomerController(ICustomerService customerService)
+		{
+			_customerService = customerService;
+		}
+
 		[HttpGet]
 		[Route("getAll")]
-		public ActionResult GetAll(Guid id)
+		public async Task<ActionResult> GetAll()
 		{
+			try
+			{
+				var customers = await _customerService.GetCustomers();
+
+
+			}
+			catch (Exception)
+			{
+
+				throw;
+			}
 			return null;
 		}
 
 		[HttpGet]
 		[Route("get/{id}")]
-		public ActionResult GetById(Guid id)
+		public async Task<ActionResult> GetById(Guid id)
 		{
 			return null;
 		}
 
 		[HttpPost]
 		[Route("add")]
-		public ActionResult Create()
+		public async Task<ActionResult> Create()
 		{
 			return null;
 		}
 
 		[HttpPost]
 		[Route("update")]
-		public ActionResult Update()
+		public async Task<ActionResult> Update()
 		{
 			return null;
 		}
 
 		[HttpDelete]
 		[Route("delete/{id}")]
-		public ActionResult Delete(Guid id)
+		public async Task<ActionResult> Delete(Guid id)
 		{
 			return null;
 		}
