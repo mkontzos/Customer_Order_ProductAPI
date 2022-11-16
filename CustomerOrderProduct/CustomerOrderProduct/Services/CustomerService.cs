@@ -33,7 +33,12 @@ namespace CustomerOrderProduct.Services
 				_customerOrderProductDbContext.Entry(customer).State = EntityState.Added;
 				await _customerOrderProductDbContext.SaveChangesAsync();
 
-				return customerDto;
+				var createdCustomerDto = new CustomerDto
+				{
+					Id = customer.Id
+				};
+
+				return createdCustomerDto;
 			}
 			catch (Exception e)
 			{
