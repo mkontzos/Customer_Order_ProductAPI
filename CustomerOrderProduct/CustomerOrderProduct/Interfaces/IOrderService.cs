@@ -1,14 +1,15 @@
 ﻿using CustomerOrderProduct.DTOS;
 using CustomerOrderProduct.Models;
+using Helpers.Messages;
 
 namespace CustomerOrderProduct.Interfaces
 {
 	public interface IOrderService
 	{
-		Task<Order> GetOrderById(Guid id);
-		Task<ICollection<Order>> GetOrders();
-		Task<OrderDto> CreateOrder(OrderDto orderDto);
-		Task<OrderDto> UpdateOrder(OrderDto orderDto);
-		Task<OrderDto> DeleteOrder(Guid id);
+		Task<GenericResponse<OrderDto>> GetOrderById(Guid id);
+		Task<GenericResponse<List<Order>>> GetOrders();
+		Task<GenericResponse<OrderDto>> CreateOrder(OrderDto orderDto);
+		Task<GenericResponse<OrderDto>> UpdateOrder(OrderDto orderDto);
+		Task<GenericResponse<OrderDto>> DeleteOrder(Guid id);
 	}
 }
