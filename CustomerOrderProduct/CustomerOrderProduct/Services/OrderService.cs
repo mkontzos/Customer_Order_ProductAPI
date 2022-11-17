@@ -17,7 +17,42 @@ namespace CustomerOrderProduct.Services
 
 		public async Task<GenericResponse<OrderDto>> CreateOrder(OrderDto orderDto)
 		{
-			throw new NotImplementedException();
+			var response = new GenericResponse<OrderDto>();
+			try
+			{
+				var order = new Order
+				{
+					Id = Guid.NewGuid(),
+					CreatedDate = DateTime.Now,
+					CustomerId = orderDto.CustomerId,
+					Products = orderDto.Products,
+				};
+
+				_customerOrderProductDbContext.Entry(order).State = EntityState.Added;
+				await _customerOrderProductDbContext.SaveChangesAsync();
+
+				var createdOrderDto = new OrderDto
+				{
+					Id = order.Id
+				};
+
+				response.Success = true;
+				response.Message = "Successfully created new order record.";
+				response.Data = createdOrderDto;
+
+				//return response;
+			}
+			catch (Exception e)
+			{
+				// log error
+				response.Success = false;
+				response.ErrorCode = "500";
+				response.Message = e.Message;
+
+				//return response;
+			}
+
+			return response;
 		}
 
 		public async Task<GenericResponse<OrderDto>> GetOrderById(Guid id)
@@ -52,7 +87,7 @@ namespace CustomerOrderProduct.Services
 				response.ErrorCode = "404";
 				response.Message = "No record with given id found in the database";
 
-				return response;
+				//return response;
 			}
 			catch (Exception e)
 			{
@@ -61,8 +96,10 @@ namespace CustomerOrderProduct.Services
 				response.ErrorCode = "500";
 				response.Message = e.Message;
 
-				return response;
+				//return response;
 			}
+
+			return response;
 		}
 
 		public async Task<GenericResponse<List<Order>>> GetOrders()
@@ -85,7 +122,7 @@ namespace CustomerOrderProduct.Services
 				response.ErrorCode = "404";
 				response.Message = "No order records found in the database.";
 
-				return response;
+				//return response;
 			}
 			catch (Exception e)
 			{
@@ -95,19 +132,106 @@ namespace CustomerOrderProduct.Services
 				response.ErrorCode = "500";
 				response.Message = e.Message;
 
-				return response;
+				//return response;
 			}
-			
+
+			return response;
 		}
 
 		public async Task<GenericResponse<OrderDto>> UpdateOrder(OrderDto orderDto)
 		{
-			throw new NotImplementedException();
+			var response = new GenericResponse<OrderDto>();
+
+			try
+			{
+				var orderInDb = await _customerOrderProductDbContext.Orders
+					.Where(o => o.Id == orderDto.Id)
+					.SingleOrDefaultAsync();
+
+				if (orderInDb != null)
+				{
+					orderInDb.CanceledDate = orderDto.CanceledDate;
+					orderInDb.DeliveredDate = orderDto.DeliveredDate;
+
+					// order manipulation for add or remove items
+					// possible solution is to add flag on product
+					// as added or deleted. Second solution is to
+					// check missing items in old list and add them
+					// and vice versa for the new list and delete them.
+
+					_customerOrderProductDbContext.Entry(orderDto).State = EntityState.Modified;
+					await _customerOrderProductDbContext.SaveChangesAsync();
+
+					var updatedOrderDto = new OrderDto
+					{
+						Id = orderInDb.Id
+					};
+
+					response.Success = true;
+					response.Data = updatedOrderDto;
+
+					return response;
+				}
+
+				response.Success = false;
+				response.ErrorCode = "404";
+				response.Message = "No record found with give id in database.";
+
+				//return response;
+			}
+			catch (Exception e)
+			{
+				// log error
+				response.Success = false;
+				response.ErrorCode = "500";
+				response.Message = e.Message;
+
+				//return response;
+			}
+
+			return response;
 		}
 
 		public async Task<GenericResponse<OrderDto>> DeleteOrder(Guid id)
 		{
-			throw new NotImplementedException();
+			var response = new GenericResponse<OrderDto>();
+
+			try
+			{
+				var order = await _customerOrderProductDbContext.Orders
+					.Where(o => o.Id == id)
+					.SingleOrDefaultAsync();
+
+				if (order != null)
+				{
+					var deletedOrderDto = new OrderDto
+					{
+						Id = id
+					};
+
+					response.Success = true;
+					response.Data = deletedOrderDto;
+
+					return response;
+				}
+
+				response.Success = false;
+				response.ErrorCode = "404";
+				response.Message = "No record with give id found";
+
+				//return response;
+			}
+			catch (Exception e)
+			{
+				// log error
+				response.Success = false;
+				response.ErrorCode = "500";
+				response.Message = e.Message;
+
+				//return response;
+			}
+
+			return response;
 		}
 	}
 }

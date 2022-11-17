@@ -1,4 +1,5 @@
-﻿using CustomerOrderProduct.Interfaces;
+﻿using CustomerOrderProduct.DTOS;
+using CustomerOrderProduct.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerOrderProduct.Controllers
@@ -52,23 +53,67 @@ namespace CustomerOrderProduct.Controllers
 
 		[HttpPost]
 		[Route("add")]
-		public async Task<ActionResult> Create()
+		public async Task<ActionResult> Create([FromBody] OrderDto orderDto)
 		{
-			return null;
+			if (orderDto == null)
+			{
+				return BadRequest();
+			}
+
+			var result = await _orderService.CreateOrder(orderDto);
+
+			if (result.ErrorCode == "500")
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+			}
+
+			return Ok(result);
 		}
 
 		[HttpPost]
 		[Route("update")]
-		public async Task<ActionResult> Update()
+		public async Task<ActionResult> Update([FromBody] OrderDto orderDto)
 		{
-			return null;
+			if (orderDto == null)
+			{
+				return BadRequest();
+			}
+
+			var result = await _orderService.UpdateOrder(orderDto);
+
+			if (result.ErrorCode == "404")
+			{
+				return NotFound(result);
+			}
+			else if (result.ErrorCode == "500")
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+			}
+
+			return Ok(result);
 		}
 
 		[HttpDelete]
 		[Route("delete/{id}")]
 		public async Task<ActionResult> Delete(Guid id)
 		{
-			return null;
+			if (id == Guid.Empty)
+			{
+				return BadRequest();
+			}
+
+			var result = await _orderService.DeleteOrder(id);
+
+			if (result.ErrorCode == "404")
+			{
+				return NotFound(result);
+			}
+			else if (result.ErrorCode == "500")
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+			}
+
+			return Ok(result);
 		}
 	}
 }
