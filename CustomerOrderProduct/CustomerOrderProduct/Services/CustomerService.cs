@@ -27,7 +27,7 @@ namespace CustomerOrderProduct.Services
 					Gender = customerDto.Gender,
 					Email = customerDto.Email,
 					BirthDate = customerDto.BirthDate,
-					CreatedDate = customerDto.CreatedDate,
+					CreatedDate = DateTime.Now,
 				};
 
 				_customerOrderProductDbContext.Entry(customer).State = EntityState.Added;
@@ -105,8 +105,9 @@ namespace CustomerOrderProduct.Services
 					customerInDb.Lastname = customerDto.Lastname;
 					customerInDb.Gender = customerDto.Gender;
 					customerInDb.Email = customerDto.Email;
-					customerInDb.BirthDate = customerDto.BirthDate;
-					customerInDb.UpdatedDate = customerDto.UpdatedDate;
+					customerInDb.UpdatedDate = DateTime.Now;
+
+					// Pending handling for orders
 
 					_customerOrderProductDbContext.Entry(customerInDb).State = EntityState.Modified;
 					await _customerOrderProductDbContext.SaveChangesAsync();

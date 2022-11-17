@@ -38,8 +38,8 @@ namespace CustomerOrderProduct.Controllers
 		}
 
 		[HttpGet]
-		[Route("get/{id}")]
-		public async Task<ActionResult> GetById(Guid id)
+		[Route("get")]
+		public async Task<ActionResult> GetById([FromQuery] Guid id)
 		{
 			try
 			{
@@ -111,8 +111,8 @@ namespace CustomerOrderProduct.Controllers
 		}
 
 		[HttpDelete]
-		[Route("delete/{id}")]
-		public async Task<ActionResult> Delete(Guid id)
+		[Route("delete")]
+		public async Task<ActionResult> Delete([FromQuery] Guid id)
 		{
 			if (id != Guid.Empty)
 			{
