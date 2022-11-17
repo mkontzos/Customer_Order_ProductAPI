@@ -1,7 +1,7 @@
 ﻿using CustomerOrderProduct.DTOS;
 using CustomerOrderProduct.Interfaces;
 using CustomerOrderProduct.Models;
-using Helpers.Messages;
+using Generics.Messages;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomerOrderProduct.Services

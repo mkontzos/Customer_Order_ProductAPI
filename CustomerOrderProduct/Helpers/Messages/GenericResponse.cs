@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Helpers.Messages
+namespace Generics.Messages
 {
 	public class GenericResponse<T>
 	{

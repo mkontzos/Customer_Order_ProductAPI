@@ -1,6 +1,6 @@
 ﻿using CustomerOrderProduct.DTOS;
 using CustomerOrderProduct.Models;
-using Helpers.Messages;
+using Generics.Messages;
 
 namespace CustomerOrderProduct.Interfaces
 {
