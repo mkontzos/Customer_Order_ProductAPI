@@ -1,6 +1,7 @@
 ﻿using CustomerOrderProduct.DTOS;
 using CustomerOrderProduct.Interfaces;
 using CustomerOrderProduct.Models;
+using Generics.HelperClasses;
 using Generics.Messages;
 using Microsoft.EntityFrameworkCore;
 
@@ -46,7 +47,7 @@ namespace CustomerOrderProduct.Services
 			{
 				// log error
 				response.Success = false;
-				response.ErrorCode = "500";
+				response.ErrorCode = ErrorCodes.Status500InternalServerError;
 				response.Message = e.Message;
 
 				//return response;
@@ -84,7 +85,7 @@ namespace CustomerOrderProduct.Services
 				}
 
 				response.Success = false;
-				response.ErrorCode = "404";
+				response.ErrorCode = ErrorCodes.Status404NotFound;
 				response.Message = "No record with given id found in the database";
 
 				//return response;
@@ -93,7 +94,7 @@ namespace CustomerOrderProduct.Services
 			{
 				// log error
 				response.Success = false;
-				response.ErrorCode = "500";
+				response.ErrorCode = ErrorCodes.Status500InternalServerError;
 				response.Message = e.Message;
 
 				//return response;
@@ -102,9 +103,9 @@ namespace CustomerOrderProduct.Services
 			return response;
 		}
 
-		public async Task<GenericResponse<List<Order>>> GetOrders()
+		public async Task<GenericResponse<ICollection<Order>>> GetOrders()
 		{
-			var response = new GenericResponse<List<Order>>();
+			var response = new GenericResponse<ICollection<Order>>();
 			try
 			{
 				var orders = await _customerOrderProductDbContext.Orders
@@ -119,7 +120,7 @@ namespace CustomerOrderProduct.Services
 				}
 
 				response.Success = false;
-				response.ErrorCode = "404";
+				response.ErrorCode = ErrorCodes.Status404NotFound;
 				response.Message = "No order records found in the database.";
 
 				//return response;
@@ -129,7 +130,7 @@ namespace CustomerOrderProduct.Services
 				// log error
 
 				response.Success = false;
-				response.ErrorCode = "500";
+				response.ErrorCode = ErrorCodes.Status500InternalServerError;
 				response.Message = e.Message;
 
 				//return response;
@@ -174,8 +175,8 @@ namespace CustomerOrderProduct.Services
 				}
 
 				response.Success = false;
-				response.ErrorCode = "404";
-				response.Message = "No record found with give id in database.";
+				response.ErrorCode = ErrorCodes.Status404NotFound;
+				response.Message = "No record found with given id in database.";
 
 				//return response;
 			}
@@ -183,7 +184,7 @@ namespace CustomerOrderProduct.Services
 			{
 				// log error
 				response.Success = false;
-				response.ErrorCode = "500";
+				response.ErrorCode = ErrorCodes.Status500InternalServerError;
 				response.Message = e.Message;
 
 				//return response;
@@ -216,7 +217,7 @@ namespace CustomerOrderProduct.Services
 				}
 
 				response.Success = false;
-				response.ErrorCode = "404";
+				response.ErrorCode = ErrorCodes.Status404NotFound;
 				response.Message = "No record with give id found";
 
 				//return response;
@@ -225,7 +226,7 @@ namespace CustomerOrderProduct.Services
 			{
 				// log error
 				response.Success = false;
-				response.ErrorCode = "500";
+				response.ErrorCode = ErrorCodes.Status500InternalServerError;
 				response.Message = e.Message;
 
 				//return response;

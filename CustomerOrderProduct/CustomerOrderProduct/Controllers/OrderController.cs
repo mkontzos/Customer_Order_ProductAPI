@@ -1,5 +1,6 @@
 ﻿using CustomerOrderProduct.DTOS;
 using CustomerOrderProduct.Interfaces;
+using Generics.HelperClasses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerOrderProduct.Controllers
@@ -21,11 +22,11 @@ namespace CustomerOrderProduct.Controllers
 		{
 			var result = await _orderService.GetOrders();
 
-			if (result.ErrorCode == "404")
+			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
 				return NotFound(result);
 			}
-			else if(result.ErrorCode == "500")
+			else if(result.ErrorCode == ErrorCodes.Status500InternalServerError)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
 			}
@@ -39,11 +40,11 @@ namespace CustomerOrderProduct.Controllers
 		{
 			var result = await _orderService.GetOrderById(id);
 
-			if (result.ErrorCode == "404")
+			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
 				return NotFound(result);
 			}
-			else if (result.ErrorCode == "500")
+			else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
 			}
@@ -62,7 +63,7 @@ namespace CustomerOrderProduct.Controllers
 
 			var result = await _orderService.CreateOrder(orderDto);
 
-			if (result.ErrorCode == "500")
+			if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
 			}
@@ -81,11 +82,11 @@ namespace CustomerOrderProduct.Controllers
 
 			var result = await _orderService.UpdateOrder(orderDto);
 
-			if (result.ErrorCode == "404")
+			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
 				return NotFound(result);
 			}
-			else if (result.ErrorCode == "500")
+			else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
 			}
@@ -104,11 +105,11 @@ namespace CustomerOrderProduct.Controllers
 
 			var result = await _orderService.DeleteOrder(id);
 
-			if (result.ErrorCode == "404")
+			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
 				return NotFound(result);
 			}
-			else if (result.ErrorCode == "500")
+			else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
 			}

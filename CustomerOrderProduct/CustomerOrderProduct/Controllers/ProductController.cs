@@ -1,6 +1,8 @@
 ﻿using CustomerOrderProduct.DTOS;
 using CustomerOrderProduct.Interfaces;
 using CustomerOrderProduct.Models;
+using CustomerOrderProduct.Services;
+using Generics.HelperClasses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerOrderProduct.Controllers
@@ -22,86 +24,99 @@ namespace CustomerOrderProduct.Controllers
 		{
 			var result = await _productService.GetProducts();
 
-			if (result.Count > 0)
+			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
-				return Ok(result);
+				return NotFound(result);
+			}
+			else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
 			}
 
-			return NotFound();
+			return Ok(result);
 		}
 
 		[HttpGet]
 		[Route("get/{id}")]
 		public async Task<ActionResult> GetById(Guid id)
 		{
-			if (id != Guid.Empty)
+			var result = await _productService.GetProductById(id);
+
+			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
-				var result = await _productService.GetProductById(id);
-
-				if (result != null)
-				{
-					return Ok(result);
-				}
-
-				return NotFound();
+				return NotFound(result);
 			}
-			
-			return BadRequest();
+			else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+			}
+
+			return Ok(result);
 		}
 
 		[HttpPost]
 		[Route("add")]
 		public async Task<ActionResult> Create([FromBody] ProductDto productDto)
 		{
-			if (productDto != null)
+			if (productDto == null)
 			{
-				var result = await _productService.CreateProduct(productDto);
-
-				if (result != null)
-				{
-					return Ok(result);
-				}
-
 				return BadRequest();
 			}
-			return BadRequest() ;
+
+			var result = await _productService.CreateProduct(productDto);
+
+			if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+			}
+
+			return Ok(result);
 		}
 
 		[HttpPost]
 		[Route("update")]
 		public async Task<ActionResult> Update([FromBody] ProductDto productDto)
 		{
-			if (productDto != null)
+			if (productDto == null)
 			{
-				var result = await _productService.UpdateProduct(productDto);
-
-				if (result != null)
-				{
-					return Ok(result);
-				}
-
-				return NotFound();
+				return BadRequest();
 			}
-			return BadRequest();
+
+			var result = await _productService.UpdateProduct(productDto);
+
+			if (result.ErrorCode == ErrorCodes.Status404NotFound)
+			{
+				return NotFound(result);
+			}
+			else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+			}
+
+			return Ok(result);
 		}
 
 		[HttpDelete]
 		[Route("delete/{id}")]
 		public async Task<ActionResult> Delete(Guid id)
 		{
-			if (id != Guid.Empty)
+			if (id == Guid.Empty)
 			{
-				var result = await _productService.DeleteProduct(id);
-
-				if (result != null)
-				{
-					return Ok(result);
-				}
-
-				return NotFound();
+				return BadRequest();
 			}
 
-			return BadRequest();
+			var result = await _productService.DeleteProduct(id);
+
+			if (result.ErrorCode == ErrorCodes.Status404NotFound)
+			{
+				return NotFound(result);
+			}
+			else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+			}
+
+			return Ok(result);
 		}
 	}
 }

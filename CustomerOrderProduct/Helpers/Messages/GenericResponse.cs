@@ -11,6 +11,6 @@ namespace Generics.Messages
 		public T? Data { get; set; }
 		public bool Success { get; set; }
 		public string? Message { get; set; }
-		public string? ErrorCode { get; set; }
+		public int? ErrorCode { get; set; }
 	}
 }

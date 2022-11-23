@@ -1,6 +1,8 @@
 ﻿using CustomerOrderProduct.DTOS;
 using CustomerOrderProduct.Interfaces;
 using CustomerOrderProduct.Models;
+using CustomerOrderProduct.Services;
+using Generics.HelperClasses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerOrderProduct.Controllers
@@ -20,120 +22,101 @@ namespace CustomerOrderProduct.Controllers
 		[Route("getAll")]
 		public async Task<ActionResult> GetAll()
 		{
-			try
-			{
-				var result = await _customerService.GetCustomers();
+			var result = await _customerService.GetCustomers();
 
-				if (result.Count > 0)
-				{
-					return Ok(result);
-				}
-
-				return NotFound();
-			}
-			catch (Exception e)
+			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
-				return BadRequest(e);
+				return NotFound(result);
 			}
+			else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+			}
+
+			return Ok(result);
 		}
 
 		[HttpGet]
-		[Route("get")]
-		public async Task<ActionResult> GetById([FromQuery] Guid id)
+		[Route("get/{id}")]
+		public async Task<ActionResult> GetById(Guid id)
 		{
-			try
-			{
-				var result = await _customerService.GetCustomerById(id);
+			var result = await _customerService.GetCustomerById(id);
 
-				if (result != null)
-				{
-					return Ok(result);
-				}
-
-				return NotFound();
-			}
-			catch (Exception e)
+			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
-				return BadRequest(e);
+				return NotFound(result);
 			}
+			else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+			}
+
+			return Ok(result);
 		}
 
 		[HttpPost]
 		[Route("add")]
 		public async Task<ActionResult> Create([FromBody] CustomerDto customerDto)
 		{
-			if (customerDto != null)
+			if (customerDto == null)
 			{
-				try
-				{
-					var result = await _customerService.CreateCustomer(customerDto);
-
-					if (result != null)
-					{
-						return Ok(result);
-					}
-
-					return BadRequest();
-				}
-				catch (Exception e)
-				{
-					return BadRequest(e);
-				}
+				return BadRequest();
 			}
 
-			return BadRequest();
+			var result = await _customerService.CreateCustomer(customerDto);
+
+			if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+			}
+
+			return Ok(result);
 		}
 
 		[HttpPost]
 		[Route("update")]
 		public async Task<ActionResult> Update([FromBody] CustomerDto customerDto)
 		{
-			if (customerDto != null)
+			if (customerDto == null)
 			{
-				try
-				{
-					var result = await _customerService.UpdateCustomer(customerDto);
-
-					if (result != null)
-					{
-						return Ok(result);
-					}
-
-					return NotFound();
-				}
-				catch (Exception e)
-				{
-					return BadRequest(e);
-				}
+				return BadRequest();
 			}
 
-			return BadRequest();
+			var result = await _customerService.UpdateCustomer(customerDto);
+
+			if (result.ErrorCode == ErrorCodes.Status404NotFound)
+			{
+				return NotFound(result);
+			}
+			else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+			}
+
+			return Ok(result);
 		}
 
 		[HttpDelete]
-		[Route("delete")]
-		public async Task<ActionResult> Delete([FromQuery] Guid id)
+		[Route("delete/{id}")]
+		public async Task<ActionResult> Delete(Guid id)
 		{
-			if (id != Guid.Empty)
+			if (id == Guid.Empty)
 			{
-				try
-				{
-					var result = await _customerService.DeleteCustomer(id);
-
-					if (result != null)
-					{
-						return Ok(result);
-					}
-
-					return NotFound();
-				}
-				catch (Exception e)
-				{
-					return BadRequest(e);
-				}
+				return BadRequest();
 			}
 
-			return BadRequest();
+			var result = await _customerService.DeleteCustomer(id);
+
+			if (result.ErrorCode == ErrorCodes.Status404NotFound)
+			{
+				return NotFound(result);
+			}
+			else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+			}
+
+			return Ok(result);
 		}
 	}
 }

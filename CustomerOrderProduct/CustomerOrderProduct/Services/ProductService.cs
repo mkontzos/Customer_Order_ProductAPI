@@ -1,6 +1,8 @@
 ﻿using CustomerOrderProduct.DTOS;
 using CustomerOrderProduct.Interfaces;
 using CustomerOrderProduct.Models;
+using Generics.HelperClasses;
+using Generics.Messages;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomerOrderProduct.Services
@@ -14,8 +16,10 @@ namespace CustomerOrderProduct.Services
 			_customerOrderProductDbContext = customerOrderProductDbContext;
 		}
 
-		public async Task<ProductDto> CreateProduct(ProductDto productDto)
+		public async Task<GenericResponse<ProductDto>> CreateProduct(ProductDto productDto)
 		{
+			var response = new GenericResponse<ProductDto>();
+
 			try
 			{
 				var product = new Product
@@ -35,50 +39,98 @@ namespace CustomerOrderProduct.Services
 					Id = product.Id
 				};
 
-				return productCreatedDto;
+				response.Success = true;
+				response.Data = productCreatedDto;
+				response.Message = "Successfully created record.";
+
+				return response;
 			}
 			catch (Exception e)
 			{
 				// log error
-				return null;
+				response.Success = false;
+				response.ErrorCode = ErrorCodes.Status500InternalServerError;
+				response.Message = e.Message;
+
+				return response;
 			}
 		}
 
-		public async Task<Product> GetProductById(Guid id)
+		public async Task<GenericResponse<Product>> GetProductById(Guid id)
 		{
+			var response = new GenericResponse<Product>();
+
 			try
 			{
 				var product = await _customerOrderProductDbContext.Product
 					.Where(p => p.Id == id)
 					.SingleOrDefaultAsync();
 
-				return product;
+				if (product != null)
+				{
+					response.Success = true;
+					response.Data = product;
+					response.Message = "Successfully retrieved record.";
+
+					return response;
+				}
+
+				response.Success = false;
+				response.ErrorCode = ErrorCodes.Status404NotFound;
+				response.Message = "No record found with given id.";
+
+				return response;
 			}
 			catch (Exception e)
 			{
 				// log error
-				return null;
+				response.Success = false;
+				response.ErrorCode = ErrorCodes.Status500InternalServerError;
+				response.Message = e.Message;
+
+				return response;
 			}
 		}
 
-		public async Task<ICollection<Product>> GetProducts()
+		public async Task<GenericResponse<ICollection<Product>>> GetProducts()
 		{
+			var response = new GenericResponse<ICollection<Product>> ();
+
 			try
 			{
 				var products = await _customerOrderProductDbContext.Product
 					.ToListAsync();
 
-				return products;
+				if (products.Count > 0)
+				{
+					response.Success = true;
+					response.Data = products;
+					response.Message = "Successfully retrieved records.";
+
+					return response;
+				}
+
+				response.Success = false;
+				response.ErrorCode = ErrorCodes.Status404NotFound;
+				response.Message = "No records found in database.";
+
+				return response;
 			}
 			catch (Exception e)
 			{
 				// log error
-				return new List<Product>();
+				response.Success = false;
+				response.ErrorCode = ErrorCodes.Status500InternalServerError;
+				response.Message = e.Message;
+
+				return response;
 			}
 		}
 
-		public async Task<ProductDto> UpdateProduct(ProductDto productDto)
+		public async Task<GenericResponse<ProductDto>> UpdateProduct(ProductDto productDto)
 		{
+			var response = new GenericResponse<ProductDto>();
+
 			try
 			{
 				var productInDb = await _customerOrderProductDbContext.Product
@@ -97,9 +149,9 @@ namespace CustomerOrderProduct.Services
 						{
 							foreach (var order in productDto.Orders)
 							{
-								var existingOrder = productInDb.Orders.Where(p => p.Id == order.Id);
+								var existingOrder = productInDb.Orders.Any(p => p.Id == order.Id);
 
-								if (existingOrder == null)
+								if (existingOrder == false)
 								{
 									productInDb.Orders.Add(order);
 								}
@@ -124,20 +176,34 @@ namespace CustomerOrderProduct.Services
 						Orders = productInDb.Orders
 					};
 
-					return updatedProductDto;
+					response.Success = true;
+					response.Data = updatedProductDto;
+					response.Message = "Successfully updated record.";
+
+					return response;
 				}
 
-				return null;
+				response.Success = false;
+				response.ErrorCode = ErrorCodes.Status404NotFound;
+				response.Message = "No record found with given id.";
+
+				return response;
 			}
 			catch (Exception e)
 			{
 				// log error
-				return null;
+				response.Success = false;
+				response.ErrorCode = ErrorCodes.Status500InternalServerError;
+				response.Message = e.Message;
+
+				return response;
 			}
 		}
 
-		public async Task<ProductDto> DeleteProduct(Guid id)
+		public async Task<GenericResponse<ProductDto>> DeleteProduct(Guid id)
 		{
+			var response = new GenericResponse<ProductDto>();
+
 			try
 			{
 				var productInBd = await _customerOrderProductDbContext.Product
@@ -154,15 +220,27 @@ namespace CustomerOrderProduct.Services
 					_customerOrderProductDbContext.Entry(productInBd).State = EntityState.Deleted;
 					await _customerOrderProductDbContext.SaveChangesAsync();
 
-					return productDto;
+					response.Success = true;
+					response.Data = productDto;
+					response.Message = "Successfully deleted record.";
+
+					return response;
 				}
 
-				return null;
+				response.Success = false;
+				response.ErrorCode = ErrorCodes.Status404NotFound;
+				response.Message = "No record found with given id.";
+
+				return response;
 			}
 			catch (Exception e)
 			{
 				// log error
-				return null;
+				response.Success = true;
+				response.ErrorCode = ErrorCodes.Status500InternalServerError;
+				response.Message = e.Message;
+
+				return response;
 			}
 		}
 	}
