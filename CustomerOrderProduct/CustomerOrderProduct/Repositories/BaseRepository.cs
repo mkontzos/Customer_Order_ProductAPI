@@ -40,12 +40,27 @@ namespace CustomerOrderProduct.Services
          if (id == Guid.Empty)
          {
             response.ErrorCode = ErrorCodes.Status400BadRequest;
-            response.Message = "Id can not be empty";
+            response.Message = "Id can not be empty.";
+            return response;
          }
 
          try
          {
-            // search method by id, how do we get with linq????
+            var result = await _table.FindAsync(id);
+
+            if (result == null)
+            {
+               response.ErrorCode = ErrorCodes.Status404NotFound;
+               response.Message = "Record not found in database.";
+
+               return response;
+            }
+
+            response.Data = result;
+            response.ErrorCode = ErrorCodes.Status200Ok;
+            response.Message = "Record successfully retrieved.";
+
+            return response;
          }
          catch (Exception e)
          {
@@ -55,8 +70,6 @@ namespace CustomerOrderProduct.Services
 
             return response;
          }
-
-         return response;
       }
 
       public Task<GenericResponse<TEntity>> Create(TEntityDto entity)
