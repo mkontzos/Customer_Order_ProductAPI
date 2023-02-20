@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="HelperServices\" />
+    <Compile Remove="HelperServices\**" />
+    <EmbeddedResource Remove="HelperServices\**" />
+    <None Remove="HelperServices\**" />
   </ItemGroup>
 
 </Project>

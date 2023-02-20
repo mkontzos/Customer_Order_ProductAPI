@@ -9,9 +9,9 @@ namespace CustomerOrderProduct.Controllers
 	[Route("[controller]")]
 	public class OrderController : ControllerBase
 	{
-		private readonly IOrderService _orderService;
+		private readonly IOrderRepository _orderService;
 
-		public OrderController(IOrderService orderService)
+		public OrderController(IOrderRepository orderService)
 		{
 			_orderService = orderService;
 		}
@@ -20,13 +20,13 @@ namespace CustomerOrderProduct.Controllers
 		[Route("getAll")]
 		public async Task<ActionResult> GetAll()
 		{
-			var result = await _orderService.GetOrders();
+			var result = await _orderService.GetAll();
 
 			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
 				return NotFound(result);
 			}
-			else if(result.ErrorCode == ErrorCodes.Status500InternalServerError)
+			else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
 			}
@@ -38,7 +38,7 @@ namespace CustomerOrderProduct.Controllers
 		[Route("get/{id}")]
 		public async Task<ActionResult> GetById(Guid id)
 		{
-			var result = await _orderService.GetOrderById(id);
+			var result = await _orderService.GetById(id);
 
 			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
@@ -61,7 +61,7 @@ namespace CustomerOrderProduct.Controllers
 				return BadRequest();
 			}
 
-			var result = await _orderService.CreateOrder(orderDto);
+			var result = await _orderService.Create(orderDto);
 
 			if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
 			{
@@ -80,7 +80,7 @@ namespace CustomerOrderProduct.Controllers
 				return BadRequest();
 			}
 
-			var result = await _orderService.UpdateOrder(orderDto);
+			var result = await _orderService.Update(orderDto);
 
 			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
@@ -103,7 +103,7 @@ namespace CustomerOrderProduct.Controllers
 				return BadRequest();
 			}
 
-			var result = await _orderService.DeleteOrder(id);
+			var result = await _orderService.Delete(id);
 
 			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{

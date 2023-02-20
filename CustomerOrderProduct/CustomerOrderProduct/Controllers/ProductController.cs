@@ -1,7 +1,5 @@
 ﻿using CustomerOrderProduct.DTOS;
 using CustomerOrderProduct.Interfaces;
-using CustomerOrderProduct.Models;
-using CustomerOrderProduct.Services;
 using Generics.HelperClasses;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +9,9 @@ namespace CustomerOrderProduct.Controllers
 	[Route("[controller]")]
 	public class ProductController : ControllerBase
 	{
-		private readonly IProductService _productService;
+		private readonly IProductRepository _productService;
 
-		public ProductController(IProductService productService)
+		public ProductController(IProductRepository productService)
 		{
 			_productService = productService;
 		}
@@ -22,7 +20,7 @@ namespace CustomerOrderProduct.Controllers
 		[Route("getAll")]
 		public async Task<ActionResult> GetAll()
 		{
-			var result = await _productService.GetProducts();
+			var result = await _productService.GetAll();
 
 			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
@@ -40,7 +38,7 @@ namespace CustomerOrderProduct.Controllers
 		[Route("get/{id}")]
 		public async Task<ActionResult> GetById(Guid id)
 		{
-			var result = await _productService.GetProductById(id);
+			var result = await _productService.GetById(id);
 
 			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
@@ -63,7 +61,7 @@ namespace CustomerOrderProduct.Controllers
 				return BadRequest();
 			}
 
-			var result = await _productService.CreateProduct(productDto);
+			var result = await _productService.Create(productDto);
 
 			if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
 			{
@@ -82,7 +80,7 @@ namespace CustomerOrderProduct.Controllers
 				return BadRequest();
 			}
 
-			var result = await _productService.UpdateProduct(productDto);
+			var result = await _productService.Update(productDto);
 
 			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
@@ -105,7 +103,7 @@ namespace CustomerOrderProduct.Controllers
 				return BadRequest();
 			}
 
-			var result = await _productService.DeleteProduct(id);
+			var result = await _productService.Delete(id);
 
 			if (result.ErrorCode == ErrorCodes.Status404NotFound)
 			{
