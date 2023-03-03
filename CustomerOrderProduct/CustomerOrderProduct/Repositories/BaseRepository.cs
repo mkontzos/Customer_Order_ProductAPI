@@ -7,124 +7,159 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CustomerOrderProduct.Services
 {
-   public abstract class BaseRepository<TEntityDto, TEntity>
+    public abstract class BaseRepository<TEntityDto, TEntity>
       : IBaseRepository<TEntityDto, TEntity>
       where TEntityDto : class, new()
       where TEntity : class, new()
-   {
-      private CustomerOrderProductDbContext _context = null;
-      private readonly IMapper _mapper;
-      private DbSet<TEntity> _table = null;
+    {
+        private CustomerOrderProductDbContext _context = null;
+        private readonly IMapper _mapper;
+        private DbSet<TEntity> _table = null;
 
-      public BaseRepository(CustomerOrderProductDbContext context,
-          IMapper mapper)
-      {
-         _context = context;
-         _mapper = mapper;
-         _table = _context.Set<TEntity>();
-      }
+        public BaseRepository(CustomerOrderProductDbContext context,
+            IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+            _table = _context.Set<TEntity>();
+        }
 
-      public async Task<GenericResponse<ICollection<TEntity>>> GetAll()
-      {
-         var response = new GenericResponse<ICollection<TEntity>>();
+        public async Task<GenericResponse<ICollection<TEntity>>> GetAll()
+        {
+            var response = new GenericResponse<ICollection<TEntity>>();
 
-         response.Data = await _table.ToListAsync();
+            response.Data = await _table.ToListAsync();
 
-         return response;
-      }
-
-      public async Task<GenericResponse<TEntity>> GetById(Guid id)
-      {
-         var response = new GenericResponse<TEntity>();
-
-         if (id == Guid.Empty)
-         {
-            response.ErrorCode = ErrorCodes.Status400BadRequest;
-            response.Message = "Id can not be empty.";
             return response;
-         }
+        }
 
-         try
-         {
-            var result = await _table.FindAsync(id);
+        public async Task<GenericResponse<TEntity>> GetById(Guid id)
+        {
+            var response = new GenericResponse<TEntity>();
 
-            if (result == null)
+            if (id == Guid.Empty)
             {
-               response.ErrorCode = ErrorCodes.Status404NotFound;
-               response.Message = "Record not found in database.";
-
-               return response;
+                response.ErrorCode = ErrorCodes.Status400BadRequest;
+                response.Message = "Id can not be empty.";
+                return response;
             }
 
-            response.Data = result;
-            response.ErrorCode = ErrorCodes.Status200Ok;
-            response.Message = "Record successfully retrieved.";
+            try
+            {
+                var result = await _table.FindAsync(id);
 
-            return response;
-         }
-         catch (Exception e)
-         {
-            //log
-            response.ErrorCode = ErrorCodes.Status500InternalServerError;
-            response.Message = e.Message;
+                if (result == null)
+                {
+                    response.ErrorCode = ErrorCodes.Status404NotFound;
+                    response.Message = "Record not found in database.";
 
-            return response;
-         }
-      }
+                    return response;
+                }
 
-      public Task<GenericResponse<TEntity>> Create(TEntityDto entity)
-      {
-         var response = new GenericResponse<TEntity>();
+                response.Data = result;
+                response.ErrorCode = ErrorCodes.Status200Ok;
+                response.Message = "Record successfully retrieved.";
 
-         //try
-         //{
-         //   var newEntity = new TEntity ;
+                return response;
+            }
+            catch (Exception e)
+            {
+                //log
+                response.ErrorCode = ErrorCodes.Status500InternalServerError;
+                response.Message = e.Message;
 
-         //   var product = new Product
-         //   {
-         //      Id = Guid.NewGuid(),
-         //      Title = productDto.Title,
-         //      Manufacturer = productDto.Manufacturer,
-         //      ProductionDate = productDto.ProductionDate,
-         //      ReturnDate = productDto.ReturnDate
-         //   };
+                return response;
+            }
+        }
 
-         //   _customerOrderProductDbContext.Entry(product).State = EntityState.Added;
-         //   await _customerOrderProductDbContext.SaveChangesAsync();
+        public async Task<GenericResponse<TEntity>> Create(TEntityDto entityDto)
+        {
+            var response = new GenericResponse<TEntity>();
 
-         //   var productCreatedDto = new ProductDto
-         //   {
-         //      Id = product.Id
-         //   };
+            try
+            {
+                var entity = _mapper.Map<TEntity>(entityDto);
 
-         //   response.Success = true;
-         //   response.Data = productCreatedDto;
-         //   response.Message = "Successfully created record.";
+                await _table.AddAsync(entity);
+                await _context.SaveChangesAsync();
 
-         //   return response;
-         //}
-         //catch (Exception e)
-         //{
-         //   // log error
-         //   response.Success = false;
-         //   response.ErrorCode = ErrorCodes.Status500InternalServerError;
-         //   response.Message = e.Message;
+                var createdEntity = await _table.FindAsync(entity);
 
-         //   return response;
-         //}
+                response.Data = createdEntity;
+                response.ErrorCode = ErrorCodes.Status200Ok;
+                response.Message = "Successfully created record.";
 
-         return null;
-      }
+                return response;
+            }
+            catch (Exception e)
+            {
+                // log ex
+                response.ErrorCode = ErrorCodes.Status500InternalServerError;
+                response.Message = e.Message;
+
+                return response;
+            }
+        }
 
 
-      public Task<GenericResponse<TEntity>> Update(TEntityDto entity)
-      {
-         throw new NotImplementedException();
-      }
+        public async Task<GenericResponse<TEntity>> Update(TEntityDto entityDto)
+        {
+            var response = new GenericResponse<TEntity>();
 
-      public Task<GenericResponse<TEntity>> Delete(Guid id)
-      {
-         throw new NotImplementedException();
-      }
-   }
+            try
+            {
+                var entity = _mapper.Map<TEntity>(entityDto);
+
+                await _table.UpdateAsync(entity);
+                await _context.SaveChangesAsync();
+
+                response.Data = entity;
+                response.ErrorCode = ErrorCodes.Status200Ok;
+                response.Message = "Successfully updated record.";
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                // log ex
+                response.ErrorCode = ErrorCodes.Status500InternalServerError;
+                response.Message = e.Message;
+
+                return response;
+            }
+        }
+
+        public async Task<GenericResponse<TEntity>> Delete(Guid id)
+        {
+            var response = new GenericResponse<TEntity>();
+
+            try
+            {
+                response.ErrorCode = ErrorCodes.Status500InternalServerError;
+                response.Message = "Failed to delete record, not found in database.";
+
+                var entityInDb = await _table.FindAsync(id);
+
+                if (entityInDb != null)
+                {
+                    _table.Remove(entityInDb);
+                    _context.SaveChanges();
+
+                    response.Data = entityInDb;
+                    response.ErrorCode = ErrorCodes.Status200Ok;
+                    response.Message = "Successfully deleted record.";
+                }
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                // log ex
+                response.ErrorCode = ErrorCodes.Status500InternalServerError;
+                response.Message = e.Message;
+
+                return response;
+            }
+        }
+    }
 }
