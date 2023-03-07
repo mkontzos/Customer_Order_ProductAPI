@@ -1,139 +1,120 @@
 ﻿using CustomerOrderProduct.DTOS;
 using CustomerOrderProduct.Interfaces;
-using CustomerOrderProduct.Models;
+using Generics.HelperClasses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerOrderProduct.Controllers
 {
-	[ApiController]
-	[Route("[controller]")]
-	public class CustomerController : ControllerBase
-	{
-		private readonly ICustomerService _customerService;
+   [ApiController]
+   [Route("[controller]")]
+   public class CustomerController : ControllerBase
+   {
+      private readonly ICustomerRepository _customerService;
 
-		public CustomerController(ICustomerService customerService)
-		{
-			_customerService = customerService;
-		}
+      public CustomerController(ICustomerRepository customerService)
+      {
+         _customerService = customerService;
+      }
 
-		[HttpGet]
-		[Route("getAll")]
-		public async Task<ActionResult> GetAll()
-		{
-			try
-			{
-				var result = await _customerService.GetCustomers();
+      [HttpGet]
+      [Route("getAll")]
+      public async Task<ActionResult> GetAll()
+      {
+         var result = await _customerService.GetAll();
 
-				if (result.Count > 0)
-				{
-					return Ok(result);
-				}
+         if (result.ErrorCode == ErrorCodes.Status404NotFound)
+         {
+            return NotFound(result);
+         }
+         else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+         {
+            return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+         }
 
-				return NotFound();
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e);
-			}
-		}
+         return Ok(result);
+      }
 
-		[HttpGet]
-		[Route("get/{id}")]
-		public async Task<ActionResult> GetById(Guid id)
-		{
-			try
-			{
-				var result = await _customerService.GetCustomerById(id);
+      [HttpGet]
+      [Route("get/{id}")]
+      public async Task<ActionResult> GetById(Guid id)
+      {
+         var result = await _customerService.GetById(id);
 
-				if (result != null)
-				{
-					return Ok(result);
-				}
+         if (result.ErrorCode == ErrorCodes.Status404NotFound)
+         {
+            return NotFound(result);
+         }
+         else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+         {
+            return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+         }
 
-				return NotFound();
-			}
-			catch (Exception e)
-			{
-				return BadRequest(e);
-			}
-		}
+         return Ok(result);
+      }
 
-		[HttpPost]
-		[Route("add")]
-		public async Task<ActionResult> Create([FromBody] CustomerDto customerDto)
-		{
-			if (customerDto != null)
-			{
-				try
-				{
-					var result = await _customerService.CreateCustomer(customerDto);
+      [HttpPost]
+      [Route("add")]
+      public async Task<ActionResult> Create([FromBody] CustomerDto customerDto)
+      {
+         if (customerDto == null)
+         {
+            return BadRequest();
+         }
 
-					if (result != null)
-					{
-						return Ok(result);
-					}
+         var result = await _customerService.Create(customerDto);
 
-					return BadRequest();
-				}
-				catch (Exception e)
-				{
-					return BadRequest(e);
-				}
-			}
+         if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+         {
+            return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+         }
 
-			return BadRequest();
-		}
+         return Ok(result);
+      }
 
-		[HttpPost]
-		[Route("update")]
-		public async Task<ActionResult> Update([FromBody] CustomerDto customerDto)
-		{
-			if (customerDto != null)
-			{
-				try
-				{
-					var result = await _customerService.UpdateCustomer(customerDto);
+      [HttpPost]
+      [Route("update")]
+      public async Task<ActionResult> Update([FromBody] CustomerDto customerDto)
+      {
+         if (customerDto == null)
+         {
+            return BadRequest();
+         }
 
-					if (result != null)
-					{
-						return Ok(result);
-					}
+         var result = await _customerService.Update(customerDto);
 
-					return NotFound();
-				}
-				catch (Exception e)
-				{
-					return BadRequest(e);
-				}
-			}
+         if (result.ErrorCode == ErrorCodes.Status404NotFound)
+         {
+            return NotFound(result);
+         }
+         else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+         {
+            return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+         }
 
-			return BadRequest();
-		}
+         return Ok(result);
+      }
 
-		[HttpDelete]
-		[Route("delete/{id}")]
-		public async Task<ActionResult> Delete(Guid id)
-		{
-			if (id != Guid.Empty)
-			{
-				try
-				{
-					var result = await _customerService.DeleteCustomer(id);
+      [HttpDelete]
+      [Route("delete/{id}")]
+      public async Task<ActionResult> Delete(Guid id)
+      {
+         if (id == Guid.Empty)
+         {
+            return BadRequest();
+         }
 
-					if (result != null)
-					{
-						return Ok(result);
-					}
+         var result = await _customerService.Delete(id);
 
-					return NotFound();
-				}
-				catch (Exception e)
-				{
-					return BadRequest(e);
-				}
-			}
+         if (result.ErrorCode == ErrorCodes.Status404NotFound)
+         {
+            return NotFound(result);
+         }
+         else if (result.ErrorCode == ErrorCodes.Status500InternalServerError)
+         {
+            return StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+         }
 
-			return BadRequest();
-		}
-	}
+         return Ok(result);
+      }
+   }
 }
